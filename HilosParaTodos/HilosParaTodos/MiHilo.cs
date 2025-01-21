@@ -4,13 +4,13 @@ public class MiHilo
 {
     Thread hilo;
     private string text;
-    private Action finalAction;
-    
-    public MiHilo(string text, ref Action finalAction)
+    private EventWrapper<Action> finalizarWrapper;
+   
+    public MiHilo(string text, EventWrapper<Action> finalizarWrapper)
     {
         this.text = text;
-        finalAction += () => { Console.WriteLine($"Hilo {text}"); };
-        this.finalAction = finalAction;
+        this.finalizarWrapper = finalizarWrapper;
+        this.finalizarWrapper.Value += () => { Console.WriteLine($"Hilo {text}"); };
         hilo = new Thread(_process);
     }
 
@@ -21,8 +21,8 @@ public class MiHilo
 
     void _process()
     {
-        for (int i = 0; i < 1000; i++) Console.Write (text);
-        finalAction?.Invoke();
+        for (int i = 0; i < 1000; i++) Console.Write(text);
+        finalizarWrapper.Value?.Invoke();
         Console.WriteLine($"Ha terminado: {text}");
     }
 }
